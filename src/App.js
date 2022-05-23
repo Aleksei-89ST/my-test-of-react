@@ -4,7 +4,9 @@ import PostForm from "./components/PostForm";
 // import PostItem from "./components/PostItem";
 import PostList from "./components/PostList";
 import "./styles/App.css";
+import MyButton from "./UI/button/MyButton";
 import MyInput from "./UI/input/MyInput";
+import MyModal from "./UI/MyModal/MyModal";
 import MySelect from "./UI/select/MySelect";
 // import MyButton from "./UI/button/MyButton";
 // import MyInput from "./UI/input/MyInput";
@@ -15,13 +17,13 @@ function App() {
     { id: 2, title: "bbbbbbbbb 2", body: "tttttt" },
     { id: 3, title: "vvvvvvvvv 3", body: "iiiiiiiiiiii" },
   ]);
-  const [filter,setFilter] = useState({sort:'', query:''})
+  const [filter, setFilter] = useState({ sort: "", query: "" });
+  const [modal, setModal] = useState(false);
   // реализую двухстороннее связывание
   // const [selectedSort, setSelectedSort] = useState("");
   // const [searchQuery, setSearchQuery] = useState("");
 
   const sortedPosts = useMemo(() => {
-    console.log("ФУНКЦИЯ ОТРАБОТАЛА СОРТЕД ПОСТС");
     if (filter.sort) {
       return [...posts].sort((a, b) =>
         a[filter.sort].localeCompare(b[filter.sort])
@@ -36,6 +38,7 @@ function App() {
   }, [filter.query, sortedPosts]);
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
+    setModal(false)
   };
   // ПОЛУЧАЕМ POST ИЗ ДОЧЕРНЕГО КОМПОНЕНТА
   const removePost = (post) => {
@@ -48,18 +51,17 @@ function App() {
 
   return (
     <div className="App">
-      <PostForm create={createPost} />
+      <MyButton style={{marginTop:30}} onClick={() => setModal(true)}>Создать пользователя</MyButton>
+      <MyModal visible={modal} setVisible={setModal}>
+        <PostForm create={createPost} />
+      </MyModal>
       <hr style={{ margin: "15px 0" }} />
-      <PostFilter 
-      filter={filter}
-      setFilter={setFilter}
-      
+      <PostFilter filter={filter} setFilter={setFilter} />
+      <PostList
+        remove={removePost}
+        posts={sortedAndSearchedPost}
+        title="Посты про JS"
       />
-        <PostList
-          remove={removePost}
-          posts={sortedAndSearchedPost}
-          title="Посты про JS"
-        />
     </div>
   );
 }
