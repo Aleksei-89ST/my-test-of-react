@@ -17,8 +17,8 @@ function App() {
   };
   // ПОЛУЧАЕМ POST ИЗ ДОЧЕРНЕГО КОМПОНЕНТА
   const removePost = (post) => {
-    setPosts(posts.filter(p => p.id !== post.id))
-  }
+    setPosts(posts.filter((p) => p.id !== post.id));
+  };
   // const [title, setTitle] = useState("");
   // const [body, setBody] = useState("");
   //с помощью этого хука я получу доступ к дом элементу и уже у этого дом элемента заберу value
@@ -27,9 +27,13 @@ function App() {
   return (
     <div className="App">
       <PostForm create={createPost} />
-      <PostList remove={removePost} posts={posts} title="Посты про JS" />
+      {posts.length ? (
+        <PostList remove={removePost} posts={posts} title="Посты про JS" />
+      ) : (
+        <h1 style={{ textAlign: "center" }}>Посты не найдены</h1>
+      )}
     </div>
   );
 }
 
-export default App;  
+export default App;
