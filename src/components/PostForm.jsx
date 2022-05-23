@@ -3,7 +3,7 @@ import MyButton from "../UI/button/MyButton";
 import MyInput from "../UI/input/MyInput";
 
 function PostForm({create}) {
-  const [post, setPost] = useState({ title: "", body: "" });
+  const [post, setPost] = useState({ title: "", body: ""});
   const addNewPost = (e) => {
     e.preventDefault();
     const newPost = {

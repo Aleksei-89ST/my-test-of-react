@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import PostForm from "./components/PostForm";
 // import PostItem from "./components/PostItem";
 import PostList from "./components/PostList";
@@ -15,17 +15,21 @@ function App() {
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
   };
+  // ПОЛУЧАЕМ POST ИЗ ДОЧЕРНЕГО КОМПОНЕНТА
+  const removePost = (post) => {
+    setPosts(posts.filter(p => p.id !== post.id))
+  }
   // const [title, setTitle] = useState("");
   // const [body, setBody] = useState("");
-  //с помощью этого хука я получу доступ к дом элементу и уже этого дом элемента заберу value
-  // const bodyInputRef = useRef(); // также с помощью useRef я создал ссылку - у этой ссылки есть единственное поле CURRENT - ЭТО И ЕСТЬ ДОМ ЭЛЕМЕНТ -у которо есть поле VALUE  и это value я смогу получить
+  //с помощью этого хука я получу доступ к дом элементу и уже у этого дом элемента заберу value
+  // const bodyInputRef = useRef(); // также с помощью useRef я создал ссылку - у этой ссылки есть единственное поле CURRENT - ЭТО И ЕСТЬ ДОМ ЭЛЕМЕНТ(в нашем случае) -у которо есть поле VALUE  и это value я смогу получить
 
   return (
     <div className="App">
       <PostForm create={createPost} />
-      <PostList posts={posts} title="Посты про JS" />
+      <PostList remove={removePost} posts={posts} title="Посты про JS" />
     </div>
   );
 }
 
-export default App;
+export default App;  
