@@ -9,20 +9,27 @@ import Loader from "./Loader/Loader";
 import "./styles/App.css";
 import MyButton from "./UI/button/MyButton";
 import MyModal from "./UI/MyModal/MyModal";
+import { getPageCount, getPagesArray } from "./utils/pages";
 
 function App() {
   const [posts, setPosts] = useState([]);
   const [filter, setFilter] = useState({ sort: "", query: "" });
   const [modal, setModal] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(1);
   const sortedAndSearchedPost = usePosts(posts, filter.sort, filter.query);
-  const [fetchPosts,isPostsLoading,postError] = useFetching(async () => {
-    const posts = await PostService.getAll();
-    setPosts(posts);
-  })
+  let pagesArray = getPagesArray(totalPages);
+  const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
+    const response = await PostService.getAll(limit, page);
+    setPosts(response.data);
+    const totalCount = response.headers["x-total-count"];
+    setTotalPages(getPageCount(totalCount, limit));
+  });
 
   useEffect(() => {
     fetchPosts();
-  }, [filter]);
+  }, [page]);
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
     setModal(false);
@@ -32,6 +39,10 @@ function App() {
   const removePost = (post) => {
     setPosts(posts.filter((p) => p.id !== post.id));
   };
+  const changePage = (page) => {
+    setPage(page)
+  
+  }
 
   //с помощью этого хука я получу доступ к дом элементу и уже у этого дом элемента заберу value
   // const bodyInputRef = useRef(); // также с помощью useRef я создал ссылку - у этой ссылки есть единственное поле CURRENT - ЭТО И ЕСТЬ ДОМ ЭЛЕМЕНТ(в нашем случае) -у которо есть поле VALUE  и это value я смогу получить
@@ -46,9 +57,7 @@ function App() {
       </MyModal>
       <hr style={{ margin: "15px 0" }} />
       <PostFilter filter={filter} setFilter={setFilter} />
-      {postError && 
-      <h1>Произошла ошибка ${postError}</h1>
-      }
+      {postError && <h1>Произошла ошибка ${postError}</h1>}
       {isPostsLoading ? (
         <div
           style={{ display: "flex", justifyContent: "center", marginTop: 50 }}
@@ -59,9 +68,18 @@ function App() {
         <PostList
           remove={removePost}
           posts={sortedAndSearchedPost}
-          title="Посты про JS"
+          title="Посты про JavaScript"
         />
       )}
+      <div className="page__wrapper">
+        {pagesArray.map((p) => (
+          <span
+          onClick={() => changePage(p)}
+           key={p} className={page === p ? "page page__current" : "page"}>
+            {p}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
