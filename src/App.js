@@ -9,6 +9,7 @@ import Loader from "./Loader/Loader";
 import "./styles/App.css";
 import MyButton from "./UI/button/MyButton";
 import MyModal from "./UI/MyModal/MyModal";
+import Pagination from "./UI/pagination/Pagination";
 import { getPageCount, getPagesArray } from "./utils/pages";
 
 function App() {
@@ -19,8 +20,9 @@ function App() {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const sortedAndSearchedPost = usePosts(posts, filter.sort, filter.query);
-  let pagesArray = getPagesArray(totalPages);
-  const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
+ 
+
+  const [fetchPosts, isPostsLoading, postError] = useFetching(async (limit,page) => {
     const response = await PostService.getAll(limit, page);
     setPosts(response.data);
     const totalCount = response.headers["x-total-count"];
@@ -28,8 +30,8 @@ function App() {
   });
 
   useEffect(() => {
-    fetchPosts();
-  }, [page]);
+    fetchPosts(limit,page);
+  }, []);
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
     setModal(false);
@@ -41,7 +43,7 @@ function App() {
   };
   const changePage = (page) => {
     setPage(page)
-  
+  fetchPosts(limit,page)
   }
 
   //с помощью этого хука я получу доступ к дом элементу и уже у этого дом элемента заберу value
@@ -71,15 +73,7 @@ function App() {
           title="Посты про JavaScript"
         />
       )}
-      <div className="page__wrapper">
-        {pagesArray.map((p) => (
-          <span
-          onClick={() => changePage(p)}
-           key={p} className={page === p ? "page page__current" : "page"}>
-            {p}
-          </span>
-        ))}
-      </div>
+     <Pagination page={page} changePage={changePage} totalPages={totalPages}/>
     </div>
   );
 }
