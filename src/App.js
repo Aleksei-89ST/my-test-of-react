@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import axios from "axios";
+import { useEffect, useMemo, useState } from "react";
 import { usePosts } from "./components/hooks/usePost";
 import PostFilter from "./components/PostFilter";
 import PostForm from "./components/PostForm";
@@ -12,11 +13,18 @@ function App() {
   const [filter, setFilter] = useState({ sort: "", query: "" });
   const [modal, setModal] = useState(false);
   const sortedAndSearchedPost = usePosts(posts,filter.sort,filter.query)
-
+useEffect(() => {
+fetchPosts()
+}, [filter])
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
     setModal(false);
   };
+async function fetchPosts () {
+  const response = await axios.get('https://jsonplaceholder.typicode.com/posts')
+  setPosts(response.data)
+}
+
   // ПОЛУЧАЕМ POST ИЗ ДОЧЕРНЕГО КОМПОНЕНТА
   const removePost = (post) => {
     setPosts(posts.filter((p) => p.id !== post.id));
