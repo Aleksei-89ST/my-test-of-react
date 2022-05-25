@@ -19,6 +19,9 @@
     justify-content: space-between;
     align-items: center;
 }
+.post__btns {
+  display: flex;
+}
 .h1 {
     text-align: center;
 }
