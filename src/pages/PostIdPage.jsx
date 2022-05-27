@@ -8,7 +8,7 @@ const PostIdPage = () => {
   const params = useParams();
   const [post, setPost] = useState({});
   const [comments, setComments] = useState([]);
-  //Для отправки запросов ->хук возвращает массив где первый элемент это некотороя функция,второй элемент это индикатор загрузки , третий error
+  //Для отправки запросов -> хук возвращает массив где первый элемент это некотороя функция,второй элемент это индикатор загрузки , третий error
   //Параметром этот хук принимает callback который будет возвращен ввиде обёртки первым элементом этого массива
   
   // эта функция для получения постов
@@ -41,7 +41,7 @@ const PostIdPage = () => {
       ) : (
         <div>
           {comments.map((comm) => (
-            <div style={{ marginTop: 15 }}>
+            <div key={comm.id} style={{ marginTop: 15 }}>
               <h5>
                 {comm.email}
                 <div>{comm.body}</div>

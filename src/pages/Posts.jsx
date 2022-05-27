@@ -1,4 +1,4 @@
-import { useEffect,  useState } from "react";
+import { useEffect, useState } from "react";
 import PostService from "../API/PostService";
 import useFetching from "../components/hooks/useFetching";
 import { usePosts } from "../components/hooks/usePost";
@@ -11,7 +11,6 @@ import MyModal from "../UI/MyModal/MyModal";
 import Pagination from "../UI/pagination/Pagination";
 import { getPageCount } from "../utils/pages";
 
-
 function Posts() {
   const [posts, setPosts] = useState([]);
   const [filter, setFilter] = useState({ sort: "", query: "" });
@@ -20,17 +19,18 @@ function Posts() {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const sortedAndSearchedPost = usePosts(posts, filter.sort, filter.query);
- 
 
-  const [fetchPosts, isPostsLoading, postError] = useFetching(async (limit,page) => {
-    const response = await PostService.getAll(limit, page);
-    setPosts(response.data);
-    const totalCount = response.headers["x-total-count"];
-    setTotalPages(getPageCount(totalCount, limit));
-  });
+  const [fetchPosts, isPostsLoading, postError] = useFetching(
+    async (limit, page) => {
+      const response = await PostService.getAll(limit, page);
+      setPosts(response.data);
+      const totalCount = response.headers["x-total-count"];
+      setTotalPages(getPageCount(totalCount, limit));
+    }
+  );
 
   useEffect(() => {
-    fetchPosts(limit,page);
+    fetchPosts(limit, page);
   }, []);
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
@@ -42,9 +42,9 @@ function Posts() {
     setPosts(posts.filter((p) => p.id !== post.id));
   };
   const changePage = (page) => {
-    setPage(page)
-  fetchPosts(limit,page)
-  }
+    setPage(page);
+    fetchPosts(limit, page);
+  };
 
   //с помощью этого хука я получу доступ к дом элементу и уже у этого дом элемента заберу value
   // const bodyInputRef = useRef(); // также с помощью useRef я создал ссылку - у этой ссылки есть единственное поле CURRENT - ЭТО И ЕСТЬ ДОМ ЭЛЕМЕНТ(в нашем случае) -у которо есть поле VALUE  и это value я смогу получить
@@ -73,7 +73,7 @@ function Posts() {
           title="Посты про JavaScript"
         />
       )}
-     <Pagination page={page} changePage={changePage} totalPages={totalPages}/>
+      <Pagination page={page} changePage={changePage} totalPages={totalPages} />
     </div>
   );
 }
