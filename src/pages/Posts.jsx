@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PostService from "../API/PostService";
 import useFetching from "../components/hooks/useFetching";
 import { usePosts } from "../components/hooks/usePost";
@@ -19,19 +19,31 @@ function Posts() {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const sortedAndSearchedPost = usePosts(posts, filter.sort, filter.query);
-
+  const lastElement = useRef();
+  const observer = useRef();
   const [fetchPosts, isPostsLoading, postError] = useFetching(
     async (limit, page) => {
       const response = await PostService.getAll(limit, page);
-      setPosts(response.data);
+      setPosts([...posts, ...response.data]);
       const totalCount = response.headers["x-total-count"];
       setTotalPages(getPageCount(totalCount, limit));
     }
   );
+  useEffect(() => {
+    if (isPostsLoading) return;
+    if(observer.current) observer.current.disconnect()
+    let callback = function (entries, observer) {
+      if (entries[0].isEntersecting && page < totalPages) {
+        setPage(page + 1)
+      }
+    };
+    observer.current = new IntersectionObserver(callback);
+    observer.current.observe(lastElement.current);
+  }, [isPostsLoading]);
 
   useEffect(() => {
     fetchPosts(limit, page);
-  }, []);
+  }, [page]);
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
     setModal(false);
@@ -43,7 +55,6 @@ function Posts() {
   };
   const changePage = (page) => {
     setPage(page);
-    fetchPosts(limit, page);
   };
 
   //с помощью этого хука я получу доступ к дом элементу и уже у этого дом элемента заберу value
@@ -60,19 +71,19 @@ function Posts() {
       <hr style={{ margin: "15px 0" }} />
       <PostFilter filter={filter} setFilter={setFilter} />
       {postError && <h1>Произошла ошибка ${postError}</h1>}
-      {isPostsLoading ? (
+      {isPostsLoading && (
         <div
           style={{ display: "flex", justifyContent: "center", marginTop: 50 }}
         >
           <Loader />
         </div>
-      ) : (
-        <PostList
-          remove={removePost}
-          posts={sortedAndSearchedPost}
-          title="Посты про JavaScript"
-        />
       )}
+      <PostList
+        remove={removePost}
+        posts={sortedAndSearchedPost}
+        title="Посты про JavaScript"
+      />
+      <div ref={lastElement} style={{ height: 28, background: "red" }} />
       <Pagination page={page} changePage={changePage} totalPages={totalPages} />
     </div>
   );
