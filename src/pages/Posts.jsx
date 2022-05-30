@@ -10,6 +10,7 @@ import Loader from "../Loader/Loader";
 import MyButton from "../UI/button/MyButton";
 import MyModal from "../UI/MyModal/MyModal";
 import Pagination from "../UI/pagination/Pagination";
+import MySelect from "../UI/select/MySelect";
 import { getPageCount } from "../utils/pages";
 
 function Posts() {
@@ -36,7 +37,7 @@ function Posts() {
 
   useEffect(() => {
     fetchPosts(limit, page);
-  }, [page]);
+  }, [page, limit]);
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
     setModal(false);
@@ -63,6 +64,17 @@ function Posts() {
       </MyModal>
       <hr style={{ margin: "15px 0" }} />
       <PostFilter filter={filter} setFilter={setFilter} />
+      <MySelect
+        value={limit}
+        onChange={(value) => setLimit(value)}
+        defaultValue="Кол-во элементов на странице"
+        options={[
+          { value: 5, name: "5" },
+          { value: 10, name: "10" },
+          { value: 25, name: "25" },
+          { value: -1, name: "Показать всё" },
+        ]}
+      />
       {postError && <h1>Произошла ошибка ${postError}</h1>}
       {isPostsLoading && (
         <div
