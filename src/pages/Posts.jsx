@@ -33,7 +33,7 @@ function Posts() {
     if (isPostsLoading) return;
     if(observer.current) observer.current.disconnect()
     let callback = function (entries, observer) {
-      if (entries[0].isEntersecting && page < totalPages) {
+      if (entries[0].isIntersecting && page < totalPages) {
         setPage(page + 1)
       }
     };
