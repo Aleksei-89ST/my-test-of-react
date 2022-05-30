@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import PostService from "../API/PostService";
 import useFetching from "../components/hooks/useFetching";
+import { useObserver } from "../components/hooks/useObserver";
 import { usePosts } from "../components/hooks/usePost";
 import PostFilter from "../components/PostFilter";
 import PostForm from "../components/PostForm";
@@ -20,7 +21,6 @@ function Posts() {
   const [page, setPage] = useState(1);
   const sortedAndSearchedPost = usePosts(posts, filter.sort, filter.query);
   const lastElement = useRef();
-  const observer = useRef();
   const [fetchPosts, isPostsLoading, postError] = useFetching(
     async (limit, page) => {
       const response = await PostService.getAll(limit, page);
@@ -29,17 +29,10 @@ function Posts() {
       setTotalPages(getPageCount(totalCount, limit));
     }
   );
-  useEffect(() => {
-    if (isPostsLoading) return;
-    if(observer.current) observer.current.disconnect()
-    let callback = function (entries, observer) {
-      if (entries[0].isIntersecting && page < totalPages) {
-        setPage(page + 1)
-      }
-    };
-    observer.current = new IntersectionObserver(callback);
-    observer.current.observe(lastElement.current);
-  }, [isPostsLoading]);
+
+  useObserver(lastElement, page < totalPages, isPostsLoading, () => {
+    setPage(page + 1);
+  });
 
   useEffect(() => {
     fetchPosts(limit, page);
